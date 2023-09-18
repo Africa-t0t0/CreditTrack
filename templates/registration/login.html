@@ -1,0 +1,38 @@
+{% load static %}
+
+{% if errors %}
+    <div class="alert alert-danger">
+        <ul>
+            <li>{{ errors }}</li>
+        </ul>
+    </div>
+{% endif %}
+
+{% block css %}
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+{% endblock%}
+
+{% block js %}
+    <link href="{% static 'js/bootstrap.js' %}" rel="stylesheet">
+{% endblock %}
+
+<div class="container mt-5">
+    <form method="post">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-6">
+                <div class="card px-5 py-5">
+                    <div class="form-data">
+                        {% for field in form %}
+                            {% csrf_token %}
+                            <div class="forms-inputs mb-4">
+                                <span>{{ field.label_tag }}</span>
+                                {{ field }}
+                            </div>
+                        {% endfor %}
+                        <div class="mb-3"> <button type="submit" class="btn btn-dark w-100">Login</button> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

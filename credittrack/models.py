@@ -8,7 +8,7 @@ TIPO_TARJETA = (
 
 BANCOS = (
     ('bci', 'BCI'),
-    ('bchile', 'Banco de Chile'),
+    ('bch', 'Banco de Chile'),
     ('std', 'Santander'),
 )
 

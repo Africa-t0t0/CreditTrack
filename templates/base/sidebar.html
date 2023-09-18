@@ -2,28 +2,27 @@
        id="sidebarMenu"
        class="collapse d-lg-block sidebar collapse bg-white"
        >
-    <div class="position-sticky">
+    <div class="menu-list position-sticky">
       <div class="list-group list-group-flush mx-3 mt-4">
+        <a
+          href="{% url 'home' %}"
+          class="list-group-item list-group-item-action py-2 ripple"
+          ><i class="fas fa-lock fa-fw me-3"></i><span>Home</span></a>
         <a
            href="#"
            class="list-group-item list-group-item-action py-2 ripple"
            aria-current="true"
            >
           <i class="fas fa-tachometer-alt fa-fw me-3"></i
-            ><span>Main dashboard</span>
+            ><span>Administrar Mis Tarjetas</span>
         </a>
         <a
-           href="#"
-           class="list-group-item list-group-item-action py-2 ripple active"
+           href="{% url 'tarjeta_crear' %}"
+           class="list-group-item list-group-item-action py-2 ripple"
            >
           <i class="fas fa-chart-area fa-fw me-3"></i
-            ><span>Webiste traffic</span>
+            ><span>Agregar Tarjeta</span>
         </a>
-        <a
-           href="#"
-           class="list-group-item list-group-item-action py-2 ripple"
-           ><i class="fas fa-lock fa-fw me-3"></i><span>Password</span></a
-          >
         <a
            href="#"
            class="list-group-item list-group-item-action py-2 ripple"
@@ -72,3 +71,12 @@
       </div>
     </div>
   </nav>
+
+<script type="text/javascript">
+    var path = '{{request.get_full_path}}';
+    $('.menu-list').find('a').each(function(){
+        if(path.indexOf($(this).attr('href')) === 0 || ( path.indexOf('dispatch') >= 0 && $(this).attr('href').indexOf('dispatch') >= 0 )){
+            $(this).addClass('active');
+        }
+    });
+</script>

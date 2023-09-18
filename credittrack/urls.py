@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.urls import path, include
-from .views import HomeIndexView
+from .views import HomeIndexView, TarjetaCreateView
 
 from .login import CustomLoginView
 
@@ -26,4 +26,5 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('login/', CustomLoginView.as_view(), name='login'),
     path('', HomeIndexView.as_view(), name='home'),
+    path('tarjeta/crear', TarjetaCreateView.as_view(), name='tarjeta_crear'),
 ]

@@ -2,19 +2,19 @@ from django.db import models
 from django.contrib.auth.models import User
 
 TIPO_TARJETA = (
-    ('credito', 'Credito'),
-    ('debito', 'Debito'),
+    ('Credito', 'credito'),
+    ('Debito', 'debito'),
 )
 
 BANCOS = (
-    ('bci', 'BCI'),
-    ('bch', 'Banco de Chile'),
-    ('std', 'Santander'),
+    ('BCI', 'bci'),
+    ('Banco de Chile', 'bch'),
+    ('Santander', 'std'),
 )
 
 COMPANIA = (
-    ('visa', 'Visa'),
-    ('mastercard', 'Mastercard'),
+    ('Visa', 'visa'),
+    ('Mastercard', 'mastercard'),
 )
 
 class Tarjeta(models.Model):
@@ -35,3 +35,11 @@ class Tarjeta(models.Model):
         return f'{self.nombre} - {self.compania}'
 
 
+class Transaccion(models.Model):
+    tarjeta = models.ForeignKey(Tarjeta, on_delete=models.CASCADE)
+    monto = models.IntegerField()
+    fecha = models.DateField()
+    descripcion = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.tarjeta} - {self.monto} - {self.fecha}'

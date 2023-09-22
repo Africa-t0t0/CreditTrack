@@ -4,7 +4,6 @@
 
 {% block main_content %}
 
-    <div class="container">
         <div class="card">
             <div class="row">
                 <div class="card-header">
@@ -22,7 +21,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{tarjeta.nombre}}</h5>
                                 <p class="card-text">{{tarjeta.compania}}</p>
-                                <a href="#" class="btn btn-primary">Ver Detalles</a>
+                                <a href="{% url 'tarjeta_detalles' tarjeta.pk %}" class="btn btn-primary">Ver Detalles</a>
                             </div>
                         </div>
                     </div>
@@ -30,6 +29,5 @@
                 </div>
             </div>
         </div>
-    </div>
 
 {% endblock %}

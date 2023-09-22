@@ -1,0 +1,66 @@
+{% extends 'index.html' %}
+
+{% load static %}
+
+{% block main_content %}
+    <div class="card">
+        <div class="row">
+            <div class="card-header">
+                <h3 class="card-title">{{ title }}</h3>
+            </div>
+        </div>
+        <div class="card-body">
+            <a class="btn-sm btn-danger float-end" href="#" data-toggle="modal" data-target="#deleteModal">Eliminar Tarjeta <span class="glyphicon glyphicon-trash" style="color:#ffffff"></span></a>
+            <div class="row">
+                <div class="col-sm-4 mb-4">
+                    <div class="row">
+                        <p class="card-text">Nombre: {{tarjeta.nombre}}</p>
+                        <p class="card-text">Compañia: {{tarjeta.compania}}</p>
+                        <p class="card-text">Banco: {{tarjeta.banco}}</p>
+                        <p class="card-text">Tipo de Tarjeta: {{tarjeta.tipo_tarjeta}}</p>
+                        <p class="card-text">Fecha Vencimiento: {{tarjeta.fecha_vencimiento}}</p>
+                    </div>
+                </div>
+                <div class="col-sm-4 mb-4">
+                    <div class="card" style="width: 18rem;">
+                        {% with image_name=tarjeta.banco|slugify|add:'-'|add:tarjeta.tipo_tarjeta|add:'.png' %}
+                            <img class="card-img-top" src="{% static 'img/tarjetas/'|add:image_name %}" alt="Card image cap">
+                        {% endwith %}
+                        <div class="card-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card">
+        <tbody>
+
+        </tbody>
+    </div>
+
+    <!-- Modal -->
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Se eliminará la tarjeta {{ tarjeta.nombre }} y toda su información asociada. ¿Desea continuar?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

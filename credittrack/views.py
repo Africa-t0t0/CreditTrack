@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, DeleteView
 
 from .models import Tarjeta
 from .forms import AgregarTarjetaForm
@@ -32,3 +32,23 @@ class TarjetaCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.usuario = self.request.user
         return super(TarjetaCreateView, self).form_valid(form)
+
+
+class TarjetaDetailView(LoginRequiredMixin, TemplateView):
+    template_name = 'tarjetas/mostrar_detalles.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(TarjetaDetailView, self).get_context_data(*args, **kwargs)
+        context['title'] = 'Detalles de Tarjeta'
+        context['tarjeta'] = Tarjeta.objects.get(id=self.kwargs['pk'])
+        return context
+
+
+class TarjetaDeleteView(LoginRequiredMixin, DeleteView):
+    model = Tarjeta
+    success_url = '/'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        return super(TarjetaDeleteView, self).delete(request, *args, **kwargs)

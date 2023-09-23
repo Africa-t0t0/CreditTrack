@@ -1,33 +1,66 @@
 {% extends 'index.html' %}
-
 {% load static %}
+{% load bootstrap5 %}
+
+{% block js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    var montoDiferencia = "{{monto_diferencia}}";
+    var montoUtilizado = "{{tarjeta.monto_utilizado}}";
+    var datos = {
+        labels: ["Monto Utilizado", "Monto Disponible"],
+        datasets: [{
+            data: [montoUtilizado, montoDiferencia],
+            backgroundColor: [
+                'rgba(255, 0, 6, 0.4)',
+                'rgba(0, 0, 255, 0.4)'
+            ],
+            borderColor: [
+                'rgba(255, 0, 0)',
+                'rgba(0, 0, 255)'
+            ],
+            borderWidth: 2
+        }]
+    }
+    var ctx = document.getElementById('graficoTorta').getContext('2d');
+    ctx.canvas.width = 200;
+    ctx.canvas.height = 200;
+    var myPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: datos,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+});
+</script>
+{% endblock %}
 
 {% block main_content %}
-    <div class="card">
+    <div class="card mb-4">
         <div class="row">
-            <div class="card-header">
+            <div class="card-header text-center">
                 <h3 class="card-title">{{ title }}</h3>
             </div>
         </div>
         <div class="card-body">
-            <a class="btn-sm btn-danger float-end" href="#" data-toggle="modal" data-target="#deleteModal">Eliminar Tarjeta <span class="glyphicon glyphicon-trash" style="color:#ffffff"></span></a>
+            <button class="btn btn-danger btn-sm float-end" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar Tarjeta</button>
             <div class="row">
-                <div class="col-sm-4 mb-4">
+                <div class="col-sm-6 mb-4">
                     <div class="row">
-                        <p class="card-text">Nombre: {{tarjeta.nombre}}</p>
-                        <p class="card-text">Compañia: {{tarjeta.compania}}</p>
-                        <p class="card-text">Banco: {{tarjeta.banco}}</p>
-                        <p class="card-text">Tipo de Tarjeta: {{tarjeta.tipo_tarjeta}}</p>
-                        <p class="card-text">Fecha Vencimiento: {{tarjeta.fecha_vencimiento}}</p>
+                        <strong></strong>
+                        <p class="card-text"><strong>Nombre:</strong> {{tarjeta.nombre}}</p>
+                        <p class="card-text"><strong>Compañia:</strong> {{tarjeta.compania}}</p>
+                        <p class="card-text"><strong>Banco:</strong> {{tarjeta.banco}}</p>
+                        <p class="card-text"><strong>Tipo de Tarjeta:</strong> {{tarjeta.tipo_tarjeta}}</p>
+                        <p class="card-text"><strong>Fecha Vencimiento:</strong> {{tarjeta.fecha_vencimiento}}</p>
+                        <p class="card-text"><strong>Monto Disponible/Monto Utilizado:</strong>{{tarjeta.monto_utilizado}}<strong>/</strong>{{tarjeta.monto_maximo}}</p>
                     </div>
                 </div>
-                <div class="col-sm-4 mb-4">
-                    <div class="card" style="width: 18rem;">
-                        {% with image_name=tarjeta.banco|slugify|add:'-'|add:tarjeta.tipo_tarjeta|add:'.png' %}
-                            <img class="card-img-top" src="{% static 'img/tarjetas/'|add:image_name %}" alt="Card image cap">
-                        {% endwith %}
-                        <div class="card-body">
-                        </div>
+                <div class="col-sm-6 mb-4">
+                    <div class="container">
+                        <canvas id="graficoTorta" width="200" height="200"></canvas>
                     </div>
                 </div>
             </div>
@@ -36,12 +69,42 @@
     </div>
 
     <div class="card">
-        <tbody>
-
-        </tbody>
+        <div class="row">
+            <div class="card-header text-center">
+                <h3 class="card-title">Movimientos <button type="button" class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#transaccionModal">Agregar Movimiento</a></h3>
+            </div>
+        </div>
+        <table class="table table-responsive table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center pointer" style="width:7%;"><strong>Fecha</strong></th>
+                    <th class="text-center pointer" style="width:15%;"><strong>Descripción</strong></th>
+                    <th class="text-center pointer" style="width:7%;"><strong>Cuotas</strong></th>
+                    <th class="text-center pointer" style="width:7%;"><strong>Monto</strong></th>
+                    <th class="text-center pointer" style="width:3%;"><strong>Acciones</strong></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaccion in transacciones %}
+                <tr>
+                    <td>{{ transaccion.fecha }}</td>
+                    <td>{{ transaccion.descripcion }}</td>
+                    <td>{{ transaccion.n_cuotas }}</td>
+                    <td>{{ transaccion.monto }}</td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" href="#">Editar</a>
+                        <form method="post" action="{% url 'transaccion_eliminar' transaccion.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal Eliminacion -->
 
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -53,14 +116,42 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    Se eliminará la tarjeta {{ tarjeta.nombre }} y toda su información asociada. ¿Desea continuar?
+                    Se eliminará la tarjeta {{ tarjeta.nombre }} y toda la información asociada. ¿Desea continuar?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary">Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <form method="post" action="{% url 'tarjeta_eliminar' tarjeta.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Modal Formulario Transaccion -->
+
+    <div class="modal fade" id="transaccionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <form method="post" action="{% url 'transaccion_crear' tarjeta.pk %}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myModalLabel">Agregar Transaccion</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        {% bootstrap_form transacciones_form %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-success">Agregar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 
 {% endblock %}

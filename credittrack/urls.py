@@ -23,10 +23,15 @@ from .login import CustomLoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("select2/", include("django_select2.urls")),
     path('accounts/', include('django.contrib.auth.urls')),
     path('login/', CustomLoginView.as_view(), name='login'),
     path('', HomeIndexView.as_view(), name='home'),
     path('tarjeta/crear', TarjetaCreateView.as_view(), name='tarjeta_crear'),
     path('tarjeta/detalles/<int:pk>', TarjetaDetailView.as_view(), name='tarjeta_detalles'),
     path('tarjeta/eliminar/<int:pk>', TarjetaDeleteView.as_view(), name='tarjeta_eliminar'),
+    path('tarjeta/mostrar_tarjetas', TarjetaListView.as_view(), name='tarjeta_mostrar_tarjetas'),
+    path('transaccion/crear/<int:pk>', TransaccionCreateView.as_view(), name='transaccion_crear'),
+    path('transaccion/eliminar/<int:pk>', TransaccionDeleteView.as_view(), name='transaccion_eliminar'),
+    path('transaccion/editar/<int:pk>', TransaccionUpdateView.as_view(), name='transaccion_editar'),
 ]

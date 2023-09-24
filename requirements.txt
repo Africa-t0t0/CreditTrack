@@ -4,3 +4,4 @@ django-extensions
 django-select2
 django-redis
 django-bootstrap-v5
+python-dateutil

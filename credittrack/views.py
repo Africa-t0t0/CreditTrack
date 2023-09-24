@@ -1,9 +1,13 @@
+from django.db.models import Avg
 from django.shortcuts import render, redirect
-from django.views.generic import TemplateView, CreateView, DeleteView, UpdateView
+from django.views.generic import TemplateView, CreateView, DeleteView, UpdateView, View
 from django.contrib import messages
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from .models import Tarjeta, Transaccion
 from .forms import AgregarTarjetaForm, TransaccionForm
+from .utils import funcion_meses, nombre_meses
 
 from .mixins import LoginRequiredMixin
 
@@ -15,6 +19,19 @@ class HomeIndexView(LoginRequiredMixin, TemplateView):
         context = super(HomeIndexView, self).get_context_data(*args, **kwargs)
         context['title'] = 'Bienvenido a CreditTrack ' + self.request.user.username
         context['tarjetas'] = Tarjeta.objects.filter(usuario=self.request.user)
+        meses, anio = funcion_meses()
+        context['ultimos_5_meses'] = nombre_meses(meses)
+        print('meses', meses)
+        monto_mensual = []
+        for mes in meses:
+            transaccion = Transaccion.objects.filter(tarjeta__usuario=self.request.user, fecha__month=mes, fecha__year=anio).aggregate(
+                promedio=Avg('monto')
+            )
+            if transaccion['promedio'] == None:
+                transaccion['promedio'] = 0
+            print('transaccion', transaccion, 'mes', mes)
+            monto_mensual.append(transaccion['promedio'])
+        context['monto_mensual'] = monto_mensual
         return context
 
 
@@ -42,6 +59,7 @@ class TarjetaCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
+        form.instance.monto_utilizado = 0
         return super(TarjetaCreateView, self).form_valid(form)
 
 
@@ -54,7 +72,8 @@ class TarjetaDetailView(LoginRequiredMixin, TemplateView):
         context['tarjeta'] = Tarjeta.objects.get(id=self.kwargs['pk'])
         context['transacciones_form'] = TransaccionForm(initial={'tarjeta': Tarjeta.objects.get(id=self.kwargs['pk'])})
         context['transacciones'] = Transaccion.objects.filter(tarjeta=self.kwargs['pk']).order_by('-fecha')
-        context['monto_diferencia'] = int(context['tarjeta'].monto_maximo) - int(context['tarjeta'].monto_utilizado)
+        if context['tarjeta'].monto_maximo != None and context['tarjeta'].monto_utilizado != None:
+            context['monto_diferencia'] = int(context['tarjeta'].monto_maximo) - int(context['tarjeta'].monto_utilizado)
         return context
 
 
@@ -65,22 +84,23 @@ class TarjetaDeleteView(LoginRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.object.delete()
-        return super(TarjetaDeleteView, self).delete(request, *args, **kwargs)
+        return redirect('home')
 
 
-class TransaccionCreateView(LoginRequiredMixin, CreateView):
+class TransaccionCreateView(LoginRequiredMixin, View):
     form_class = TransaccionForm
-    template_name = 'transacciones/agregar_transaccion.html'
 
     def post(self, request, *args, **kwargs):
         pagina_actual = request.META.get('HTTP_REFERER')
+        print('recibimos uwu')
         form = TransaccionForm(request.POST)
         if form.is_valid():
+            print('es valido uwu')
             form.save()
             messages.success(request, 'Transaccion agregada correctamente')
         else:
+            print('no es valido uwu', form.errors)
             messages.error(request, 'Error al agregar transaccion')
-            return super(TransaccionCreateView, self).post(request, *args, **kwargs)
         return redirect(pagina_actual)
 
 

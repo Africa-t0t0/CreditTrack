@@ -2,6 +2,65 @@
 
 {% load static %}
 
+{% block js %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var meses = "{{ultimos_5_meses|safe}}";
+            meses = meses.replace('[', '').replace(']', '');
+            console.log(meses.split(','));
+            var monto = "{{monto_mensual|safe}}";
+            monto.replace('[', ''), monto.replace(']', '');
+            console.log(monto);
+
+            var ctx = document.getElementById('graficoBarras').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: meses.split(','),
+                    datasets: [{
+                        label: 'Gastos Mensuales',
+                        data: monto.split(','),
+                        backgroundColor: [
+                            'rgba(255, 0, 6, 0.4)',
+                            'rgba(0, 0, 255, 0.4)',
+                            'rgba(0, 255, 0, 0.4)',
+                            'rgba(255, 255, 0, 0.4)',
+                            'rgba(255, 0, 255, 0.4)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 0, 0)',
+                            'rgba(0, 0, 255)',
+                            'rgba(0, 255, 0)',
+                            'rgba(255, 255, 0)',
+                            'rgba(255, 0, 255)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            'beginAtZero': true,
+                            'title': {
+                                'display': true,
+                                'text': 'Monto'
+                            }
+                        },
+                        x: {
+                            'title': {
+                                'display': true,
+                                'text': 'Meses'
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
+                })
+        });
+    </script>
+{% endblock %}
+
 {% block main_content %}
 
         <div class="card">
@@ -12,20 +71,17 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    {% for tarjeta in tarjetas %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card" style="width: 18rem; height: 18rem;">
-                            {% with image_name=tarjeta.banco|slugify|add:'-'|add:tarjeta.tipo_tarjeta|add:'.png' %}
-                            <img class="card-img-top" src="{% static 'img/tarjetas/'|add:image_name %}" alt="Card image cap">
-                            {% endwith %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{tarjeta.nombre}}</h5>
-                                <p class="card-text">{{tarjeta.compania}}</p>
-                                <a href="{% url 'tarjeta_detalles' tarjeta.pk %}" class="btn btn-primary">Ver Detalles</a>
-                            </div>
+                    <div class="col-md-6">
+                        <div class="row text-center">
+                            <h4>Grafico gastos mensuales</h2>
+                        </div>
+                        <div style="width: 400; height: 250px;">
+                            <canvas id="graficoBarras"></canvas>
                         </div>
                     </div>
-                    {% endfor %}
+                    <div class="col-md-6">
+
+                    </div>
                 </div>
             </div>
         </div>

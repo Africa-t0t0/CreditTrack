@@ -43,9 +43,11 @@ class AgregarTarjetaForm(forms.ModelForm):
         label='Banco',
         widget=forms.Select(attrs={'style': 'text-transform: capitalize;'})
     )
+
+
     class Meta:
         model = Tarjeta
-        fields = ['nombre', 'tipo_tarjeta', 'compania', 'banco', 'fecha_vencimiento', 'saldo', 'monto_maximo', 'monto_utilizado', 'fecha_pago']
+        fields = ['nombre', 'tipo_tarjeta', 'compania', 'banco', 'fecha_vencimiento', 'saldo', 'monto_maximo', 'fecha_pago']
 
 
 class TransaccionForm(forms.ModelForm):

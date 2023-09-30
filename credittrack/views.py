@@ -1,4 +1,4 @@
-from django.db.models import Avg
+from django.db.models import Avg, Count
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView, CreateView, DeleteView, UpdateView, View
 from django.contrib import messages
@@ -21,17 +21,17 @@ class HomeIndexView(LoginRequiredMixin, TemplateView):
         context['tarjetas'] = Tarjeta.objects.filter(usuario=self.request.user)
         meses, anio = funcion_meses()
         context['ultimos_5_meses'] = nombre_meses(meses)
-        print('meses', meses)
         monto_mensual = []
+        cantidad_mensual = []
         for mes in meses:
-            transaccion = Transaccion.objects.filter(tarjeta__usuario=self.request.user, fecha__month=mes, fecha__year=anio).aggregate(
-                promedio=Avg('monto')
-            )
-            if transaccion['promedio'] == None:
-                transaccion['promedio'] = 0
-            print('transaccion', transaccion, 'mes', mes)
-            monto_mensual.append(transaccion['promedio'])
+            transaccion = Transaccion.objects.filter(tarjeta__usuario=self.request.user, fecha__month=mes, fecha__year=anio)
+            transaccion_monto = transaccion.aggregate(promedio=Avg('monto'))
+            if transaccion_monto['promedio'] == None:
+                transaccion_monto['promedio'] = 0
+            cantidad_mensual.append(transaccion.count())
+            monto_mensual.append(transaccion_monto['promedio'])
         context['monto_mensual'] = monto_mensual
+        context['cantidad_mensual'] = cantidad_mensual
         return context
 
 

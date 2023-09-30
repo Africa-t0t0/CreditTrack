@@ -13,9 +13,9 @@
             <div class="card-body">
                 <div class="row">
                     {% for tarjeta in tarjetas %}
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="card border-0" style="width: 13rem; height: 13rem;">
-                            {% with image_name=tarjeta.banco|slugify|add:'-'|add:tarjeta.tipo_tarjeta|add:'.png' %}
+                            {% with image_name=tarjeta.banco|slugify|add:'-'|add:tarjeta.tipo_tarjeta|slugify|add:'-'|add:tarjeta.compania|slugify|add:'.png' %}
                             <img class="card-img-top" src="{% static 'img/tarjetas/'|add:image_name %}" alt="Card image cap">
                             {% endwith %}
                             <div class="card-body">

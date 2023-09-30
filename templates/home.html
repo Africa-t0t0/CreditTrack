@@ -6,13 +6,23 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var meses = "{{ultimos_5_meses|safe}}";
-            meses = meses.replace('[', '').replace(']', '');
-            console.log(meses.split(','));
             var monto = "{{monto_mensual|safe}}";
-            monto.replace('[', ''), monto.replace(']', '');
-            console.log(monto);
+            var cantidad = "{{cantidad_mensual|safe}}";
 
+            // ahora limpiamos las comillas simples y corchetes de los arreglos
+            meses = meses.replace(/'/g, "").replace(/[\[\]']+/g, '');
+            monto = monto.replace(/'/g, "").replace(/[\[\]']+/g, '');
+            cantidad = cantidad.replace(/'/g, "").replace(/[\[\]']+/g, '');
+
+            console.log(meses);
+
+            var mesesLimpios = [];
+
+
+
+            // Ahora, mesesLimpios contendrá los nombres de los meses sin comillas simples
             var ctx = document.getElementById('graficoBarras').getContext('2d');
+            var ctx2 = document.getElementById('graficoBarras2').getContext('2d');
             var myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -56,7 +66,51 @@
                     responsive: true,
                     maintainAspectRatio: false,
                 }
-                })
+            })
+            var myChart2 = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: meses.split(','),
+                    datasets: [{
+                        label: 'Transacciones Mensuales',
+                        data: cantidad.split(','),
+                        backgroundColor: [
+                            'rgba(255, 0, 6, 0.4)',
+                            'rgba(0, 0, 255, 0.4)',
+                            'rgba(0, 255, 0, 0.4)',
+                            'rgba(255, 255, 0, 0.4)',
+                            'rgba(255, 0, 255, 0.4)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 0, 0)',
+                            'rgba(0, 0, 255)',
+                            'rgba(0, 255, 0)',
+                            'rgba(255, 255, 0)',
+                            'rgba(255, 0, 255)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            'beginAtZero': true,
+                            'title': {
+                                'display': true,
+                                'text': 'Cantidad'
+                            }
+                        },
+                        x: {
+                            'title': {
+                                'display': true,
+                                'text': 'Meses'
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
+            })
         });
     </script>
 {% endblock %}
@@ -80,7 +134,12 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-
+                        <div class="row text-center">
+                            <h4>Grafico cantidad transacciones</h4>
+                        </div>
+                        <div style="width: 400; height: 250px;">
+                            <canvas id="graficoBarras2"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>

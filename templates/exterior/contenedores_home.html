@@ -1,0 +1,180 @@
+{% extends 'index.html' %}
+
+{% load static %}
+{% load bootstrap5 %}
+
+{% load strip_filter %}
+
+
+{% block css %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var meses = "{{ultimos_5_meses|safe}}";
+        var monto = "{{monto_mensual|safe}}";
+        var cantidad = "{{cantidad_mensual|safe}}";
+
+        // ahora limpiamos las comillas simples y corchetes de los arreglos
+        meses = meses.replace(/'/g, "").replace(/[\[\]']+/g, '');
+        monto = monto.replace(/'/g, "").replace(/[\[\]']+/g, '');
+        cantidad = cantidad.replace(/'/g, "").replace(/[\[\]']+/g, '');
+
+        console.log(meses);
+
+        var mesesLimpios = [];
+
+
+
+        // Ahora, mesesLimpios contendrá los nombres de los meses sin comillas simples
+        var ctx = document.getElementById('graficoBarras').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: meses.split(','),
+                datasets: [{
+                    label: 'Gastos Mensuales',
+                    data: monto.split(','),
+                    backgroundColor: [
+                        'rgba(255, 0, 6, 0.4)',
+                        'rgba(0, 0, 255, 0.4)',
+                        'rgba(0, 255, 0, 0.4)',
+                        'rgba(255, 255, 0, 0.4)',
+                        'rgba(255, 0, 255, 0.4)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 0, 0)',
+                        'rgba(0, 0, 255)',
+                        'rgba(0, 255, 0)',
+                        'rgba(255, 255, 0)',
+                        'rgba(255, 0, 255)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        'beginAtZero': true,
+                        'title': {
+                            'display': true,
+                            'text': 'Monto'
+                        }
+                    },
+                    x: {
+                        'title': {
+                            'display': true,
+                            'text': 'Meses'
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        })
+    });
+</script>
+{% endblock %}
+
+{% block main_content %}
+
+<div class="row col-12">
+    <div class="card" style="height: 800px;">
+        <div class="card-header">
+            <div class="row justify-content-center">
+                <h3>
+                    <div class="card-title">{{ titulo }}</div>
+                </h3>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Resumen Compras</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row justify-content-center">
+                                Últimas 5 compras realizadas.
+                                <table class="table table-striped table-bordered mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Fecha</th>
+                                            <th scope="col">Estado</th>
+                                            <th scope="col">Total</th>
+                                        </tr>
+                                        <tbody>
+                                            {% for compra in compras %}
+                                            <tr>
+                                                <td>{{ compra.fecha }}</td>
+                                                {% if compra.estado.nombre|strip == 'En camino' %}
+                                                <td><span class="badge badge-primary">{{ compra.estado }}</span></td>
+                                                {% elif compra.estado.nombre|strip == 'En aduana' %}
+                                                <td><span class="badge badge-warning">{{ compra.estado }}</span></td>
+                                                {% elif compra.estado.nombre|strip == 'Retenido' %}
+                                                <td><span class="badge badge-danger">{{ compra.estado }}</span></td>
+                                                {% else %}
+                                                <td><span class="badge badge-success">{{compra.estado}}</span></td>
+                                                {% endif %}
+                                                <td>{{ compra.total }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Valores de Hoy</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row justify-content-center">
+                                Cambios en base a 1000 pesos por defecto.
+                                <br>
+                            </div>
+                            <table class="table table-striped table-bordered mt-3">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Moneda</th>
+                                        <th scope="col">Cambio</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for moneda, cambio in cambios.items %}
+                                    <tr>
+                                        <td>{{ moneda }}</td>
+                                        <td>{{ cambio }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-4">
+                <div class="col-12">
+                    <div class="card" style="height: 350px;">
+                        <div class="card-header">
+                            <h5>Grafico Gasto por Meses</h5>
+                        </div>
+                        <div class="card-body">
+                            <div style="width: 400; height: 250px;">
+                                <canvas id="graficoBarras"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -3,6 +3,9 @@ from dateutil.relativedelta import relativedelta
 
 
 def funcion_meses():
+        '''
+            Funcion que retorna los ultimos 5 meses a partir del mes actual
+        '''
         meses = []
         fecha_actual = datetime.now()
         anio = fecha_actual.year

@@ -2,6 +2,9 @@ Django==3.2.7
 environ
 django-extensions
 django-select2
+django-simple-history
 django-redis
 django-bootstrap-v5
 python-dateutil
+forex-python
+requests

@@ -1,5 +1,3 @@
-# Formulario django
-
 from django import forms
 from django_select2.forms import ModelSelect2Widget
 

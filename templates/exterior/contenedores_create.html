@@ -1,0 +1,41 @@
+{% extends 'index.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+{% block css %}
+{% endblock %}
+
+{% block js %}
+{% endblock %}
+
+{% block main_content %}
+
+<div class="row col-12">
+    <div class="card">
+        <div class="card-header">
+            <h5>
+                <strong>
+                    Creacion de Compra
+                </strong>
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    {% for field in form %}
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                {% bootstrap_field field layout='vertical' show_label=True %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

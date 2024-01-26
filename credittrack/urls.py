@@ -26,6 +26,7 @@ urlpatterns = [
     path("select2/", include("django_select2.urls")),
     path('accounts/', include('django.contrib.auth.urls')),
     path('login/', CustomLoginView.as_view(), name='login'),
+    path('exterior/', include('exterior.urls'), name='exterior'),
     path('', HomeIndexView.as_view(), name='home'),
     path('tarjeta/crear', TarjetaCreateView.as_view(), name='tarjeta_crear'),
     path('tarjeta/detalles/<int:pk>', TarjetaDetailView.as_view(), name='tarjeta_detalles'),
